@@ -1,0 +1,40 @@
+name: CentroDeComando
+options:
+  bundleIdPrefix: com.centrodecomando
+  deploymentTarget:
+    iOS: "15.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  CentroDeComando:
+    type: application
+    platform: iOS
+    sources:
+      - CentroDeComando
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.centrodecomando.ios
+        TARGETED_DEVICE_FAMILY: "1,2"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        GENERATE_INFOPLIST_FILE: NO
+    info:
+      path: CentroDeComando/Info.plist
+      properties:
+        CFBundleDisplayName: Centro de Comando
+        UILaunchScreen: {}
+        UIUserInterfaceStyle: Dark
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        NSLocalNetworkUsageDescription: Ligar ao servidor Centro de Comando na tua rede local.
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
