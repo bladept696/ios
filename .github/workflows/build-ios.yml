@@ -1,35 +1,13 @@
-name: Build iOS (IPA sem assinatura)
-on:
-  workflow_dispatch: {}
-  push:
-    tags: ['ios-v*']
-jobs:
-  build:
-    runs-on: macos-15
-    steps:
-      - uses: actions/checkout@v4
-      - name: Escolher o Xcode mais recente
-        run: |
-          XC=$(ls -d /Applications/Xcode_[0-9]*.app | grep -vi beta | sort -V | tail -1)
-          echo "A usar $XC"
-          sudo xcode-select -s "$XC/Contents/Developer"
-          xcodebuild -version
-      - name: Instalar XcodeGen
-        run: brew install xcodegen
-      - name: Gerar projeto Xcode
-        run: xcodegen generate
       - name: Compilar (sem assinatura)
         run: |
+          set +e
           xcodebuild -project CentroDeComando.xcodeproj -scheme CentroDeComando \
             -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
             -derivedDataPath build \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build
-      - name: Empacotar IPA
-        run: |
-          mkdir Payload
-          cp -R build/Build/Products/Release-iphoneos/CentroDeComando.app Payload/
-          zip -r CentroDeComando.ipa Payload
-      - uses: actions/upload-artifact@v4
-        with:
-          name: CentroDeComando-ios-unsigned
-          path: CentroDeComando.ipa
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build > build.log 2>&1
+          RC=$?
+          if [ $RC -ne 0 ]; then
+            echo "===== ERROS ====="
+            grep -E "error:|Error:" build.log | sort -u | head -30
+            exit $RC
+          fi
