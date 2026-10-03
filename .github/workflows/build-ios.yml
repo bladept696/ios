@@ -1,3 +1,21 @@
+     name: Build iOS (IPA sem assinatura)
+on:
+  workflow_dispatch: {}
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Escolher o Xcode mais recente
+        run: |
+          XC=$(ls -d /Applications/Xcode_[0-9]*.app | grep -vi beta | sort -V | tail -1)
+          echo "A usar $XC"
+          sudo xcode-select -s "$XC/Contents/Developer"
+          xcodebuild -version
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+      - name: Gerar projeto Xcode
+        run: xcodegen generate
       - name: Compilar (sem assinatura)
         run: |
           set +e
@@ -11,3 +29,12 @@
             grep -E "error:|Error:" build.log | sort -u | head -30
             exit $RC
           fi
+      - name: Empacotar IPA
+        run: |
+          mkdir Payload
+          cp -R build/Build/Products/Release-iphoneos/CentroDeComando.app Payload/
+          zip -r CentroDeComando.ipa Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CentroDeComando-ios-unsigned
+          path: CentroDeComando.ipa
