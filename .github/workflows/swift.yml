@@ -1,0 +1,13 @@
+      - name: Compilar (sem assinatura)
+        run: |
+          set +e
+          xcodebuild -project CentroDeComando.xcodeproj -scheme CentroDeComando \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build > build.log 2>&1
+          RC=$?
+          if [ $RC -ne 0 ]; then
+            echo "===== ERROS ====="
+            grep -E "error:|Error:" build.log | sort -u | head -30
+            exit $RC
+          fi
